@@ -1,4 +1,4 @@
-{{- if .Values.persistence.storageClassName == "nfs" }}
+{{- if eq .Values.persistence.storageClassName "nfs" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
