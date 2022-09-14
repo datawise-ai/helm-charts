@@ -14,6 +14,10 @@ Expand the name of the chart.
 {{ required "project required!" .Values.deploy.project }}-{{ required "app required!" .Values.deploy.app }}-{{ required "service required!" .Values.deploy.service }}-{{ required "instance required!" .Values.deploy.instance }}
 {{- end }}
 
+{{- define "datawise-base-app.appId_underscore" -}}
+{{ required "project required!" .Values.deploy.project }}_{{ required "app required!" .Values.deploy.app }}_{{ required "service required!" .Values.deploy.service }}_{{ required "instance required!" .Values.deploy.instance }}
+{{- end }}
+
 {{- define "datawise-base-app.namespace" -}}
 {{- default .Values.deploy.project .Values.deploy.namespace }}
 {{- end }}
@@ -48,15 +52,15 @@ Expand the name of the chart.
 
 
 {{- define "datawise-base-app.db_connection.user" -}}
-{{- default (include "datawise-base-app.appId" .) .Values.db.connection.user }}
+{{- default (include "datawise-base-app.appId_underscore" .) .Values.db.connection.user }}
 {{- end }}
 
 {{- define "datawise-base-app.db_connection.catalog" -}}
-{{- default (include "datawise-base-app.appId" .) .Values.db.connection.catalog }}
+{{- default (include "datawise-base-app.appId_underscore" .) .Values.db.connection.catalog }}
 {{- end }}
 
 {{- define "datawise-base-app.db_connection.name" -}}
-{{- default (include "datawise-base-app.appId" .) .Values.db.connection.catalog }}
+{{- default (include "datawise-base-app.appId_underscore" .) .Values.db.connection.catalog }}
 {{- end }}
 
 {{/*
