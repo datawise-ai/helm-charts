@@ -22,7 +22,7 @@ Expand the name of the chart.
 {{- if .Values.deploy.url }}
 {{- .Values.deploy.url }}
 {{- else }}
-{{- if .Values.deploy.service == "app" }}
+{{- if eq .Values.deploy.service "app" }}
 {{- .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.instance }}.{{ .Values.deploy.baseUrl }}
 {{- else }}
 {{- .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.service }}-{{ .Values.deploy.instance }}.{{ .Values.deploy.baseUrl }}
