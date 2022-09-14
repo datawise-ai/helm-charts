@@ -42,7 +42,7 @@ Expand the name of the chart.
 {{- if .Values.image.repository }}
 {{- .Values.image.repository }}
 {{- else }}
-{{- .Values.deploy.app }}-{{ .Values.deploy.instance }}
+{{- .Values.deploy.app }}-{{ .Values.deploy.service }}-{{ .Values.deploy.instance }}
 {{- end }}
 {{- end }}
 
