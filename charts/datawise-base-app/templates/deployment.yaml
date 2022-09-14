@@ -39,6 +39,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "datawise-base-app.image_registry" . }}/{{ include "datawise-base-app.image_repository" . }}:{{ .Values.image.tag | default .Values.deploy.version }}"
+          workingDir: {{ .Values.persistence.mount | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.image.command }}
           {{- with .Values.image.command }}
@@ -74,6 +75,9 @@ spec:
                 optional: true
             - configMapRef:
                 name: "{{ .Values.deploy.project }}-{{ .Values.deploy.app }}-config"
+                optional: true
+            - configMapRef:
+                name: "{{ .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.service }}-config"
                 optional: true
             - configMapRef:
                 name: "{{ .Values.deploy.project }}-{{ .Values.deploy.instance }}-config"
@@ -121,10 +125,19 @@ spec:
               value: "http://{{ include "datawise-base-app.hostname" . }}"
             - name: API_PORT
               value: {{ .Values.app.port | quote }}
+            - name: STORAGE_HOME
+              value: {{ .Values.persistence.mount | quote }}              
             {{- range $k, $v := .Values.environment }}
             - name: {{ $k }}
               value: {{ $v | quote}}
-            {{- end }}              
+            {{- end }}           
+          volumeMounts:
+            - mountPath: {{ .Values.persistence.mount | quote }}
+              name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+      volumes:
+        - name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+          persistentVolumeClaim:
+            claimName: "{{ .Values.persistence.existingClaim | default (include "datawise-base-app.fullname" .) }}-{{ .Values.persistence.name }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

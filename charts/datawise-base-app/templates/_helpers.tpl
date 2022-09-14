@@ -6,12 +6,12 @@ Expand the name of the chart.
 {{- end }}
 
 {{- define "datawise-base-app.validations" -}}
-{{ required "project required!" .Values.deploy.project }}-{{ required "app required!" .Values.deploy.app }}-{{ required "instance required!" .Values.deploy.instance }}-{{ required "version required!" .Values.deploy.version }}
+{{ required "project required!" .Values.deploy.project }}-{{ required "app required!" .Values.deploy.app }}-{{ required "service required!" .Values.deploy.service }}-{{ required "instance required!" .Values.deploy.instance }}-{{ required "version required!" .Values.deploy.version }}
 {{- end }}
 
 
 {{- define "datawise-base-app.appId" -}}
-{{ required "project required!" .Values.deploy.project }}-{{ required "app required!" .Values.deploy.app }}-{{ required "instance required!" .Values.deploy.instance }}
+{{ required "project required!" .Values.deploy.project }}-{{ required "app required!" .Values.deploy.app }}-{{ required "service required!" .Values.deploy.service }}-{{ required "instance required!" .Values.deploy.instance }}
 {{- end }}
 
 {{- define "datawise-base-app.namespace" -}}
@@ -22,7 +22,11 @@ Expand the name of the chart.
 {{- if .Values.deploy.url }}
 {{- .Values.deploy.url }}
 {{- else }}
-{{- (include "datawise-base-app.appId" .) }}.{{ .Values.deploy.baseUrl }}
+{{- if .Values.deploy.service == "app" }}
+{{- .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.instance }}.{{ .Values.deploy.baseUrl }}
+{{- else }}
+{{- .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.service }}-{{ .Values.deploy.instance }}.{{ .Values.deploy.baseUrl }}
+{{- end }}
 {{- end }}
 {{- end }}
 
