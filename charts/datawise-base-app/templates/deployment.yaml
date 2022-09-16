@@ -107,7 +107,7 @@ spec:
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
               value: {{ .Values.db.connection.host | quote }}
             {{- end }}
-            {{- if .Values.db.vars.port }}
+            {{- if .Values.db.connection.port }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.port }}
               value: {{ .Values.db.connection.port | quote }}
             {{- end }}
