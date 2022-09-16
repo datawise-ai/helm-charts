@@ -87,7 +87,7 @@ spec:
                 optional: true
             - secretRef:
                 name: "{{ include "datawise-base-app.fullname" .  }}-secrets"
-                optional: true                
+                optional: {{ .Values.deploy.require_secrets }}
             {{- range .Values.configMaps }}
             - configMapRef:
                 name: {{ .name }}
@@ -107,8 +107,10 @@ spec:
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
               value: {{ .Values.db.connection.host | quote }}
             {{- end }}
+            {{- if .Values.db.vars.port }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.port }}
               value: {{ .Values.db.connection.port | quote }}
+            {{- end }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.user }}
               value: {{ include "datawise-base-app.db_connection.user" . | quote }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.catalog }}

@@ -4,6 +4,7 @@
 
 deploy:
   path: "/"
+  require_secrets: true
 
 app:
   port: 80
@@ -13,7 +14,7 @@ app:
 
 environment:
   _JAVA_OPTIONS: -Xmx4g
-  API_ACTIVE_PROFILE: development
+  ACTIVE_PROFILE: development
 
 db:
   vars:
@@ -27,7 +28,7 @@ db:
     user: ""
     catalog: ""
     host: ""
-    port: 5432
+    #port: 5432
 
 persistence:
   storageClass: "dw-datastore-dev-1"
