@@ -21,7 +21,7 @@ spec:
       {{- end }}
       labels:
         {{- include "datawise-base-app.selectorLabels" . | nindent 8 }}
-        {{- include "datawise-base-app.labels" . | nindent 4 }}
+        {{- include "datawise-base-app.labels" . | nindent 8 }}
     spec:
       {{- if .Values.image.pullSecrets }}
       {{- with .Values.image.pullSecrets }}
