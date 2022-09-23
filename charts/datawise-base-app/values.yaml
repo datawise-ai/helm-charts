@@ -93,9 +93,9 @@ service:
 ingress:
   enabled: true
   className: "nginx"
-  annotations: 
-    cert-manager.io/cluster-issuer: "letsencrypt-staging"
-    ingress.kubernetes.io/ssl-redirect: "false"    
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    ingress.kubernetes.io/ssl-redirect: "false"
     acme.cert-manager.io/http01-edit-in-place: "true"
     #nginx.org/mergeable-ingress-type: "master"
   # hosts:
@@ -103,12 +103,12 @@ ingress:
   #     paths:
   #       - path: /
   #         pathType: Prefix
-  # tls: 
+  # tls:
   #   - secretName: testa12-another
   #     hosts:
   #       - test12.dev.datawise.ai
 
-resources: 
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ include "datawise-base-app.namespace" . }}  
+  namespace: {{ include "datawise-base-app.namespace" . }}
   name: {{ include "datawise-base-app.fullname" . }}
   labels:
     {{- include "datawise-base-app.labels" . | nindent 4 }}
@@ -14,13 +14,14 @@ spec:
       {{- include "datawise-base-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      namespace: {{ include "datawise-base-app.namespace" . }}        
+      namespace: {{ include "datawise-base-app.namespace" . }}
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "datawise-base-app.selectorLabels" . | nindent 8 }}
+        {{- include "datawise-base-app.labels" . | nindent 4 }}
     spec:
       {{- if .Values.image.pullSecrets }}
       {{- with .Values.image.pullSecrets }}
@@ -44,15 +45,15 @@ spec:
           {{- if .Values.image.command }}
           {{- with .Values.image.command }}
           command:
-            {{- toYaml . | nindent 12 }}          
+            {{- toYaml . | nindent 12 }}
           {{- end}}
           {{- end}}
           {{- if .Values.image.args }}
           {{- with .Values.image.args }}
           args:
-            {{- toYaml . | nindent 12 }}          
+            {{- toYaml . | nindent 12 }}
           {{- end}}
-          {{- end}}          
+          {{- end}}
           ports:
             - name: appport
               containerPort: {{ .Values.app.port }}
@@ -81,7 +82,7 @@ spec:
                 optional: true
             - configMapRef:
                 name: "{{ .Values.deploy.project }}-{{ .Values.deploy.instance }}-config"
-                optional: true                
+                optional: true
             - configMapRef:
                 name: "{{ include "datawise-base-app.fullname" .  }}-config"
                 optional: true
@@ -128,11 +129,11 @@ spec:
             - name: API_PORT
               value: {{ .Values.app.port | quote }}
             - name: STORAGE_HOME
-              value: {{ .Values.persistence.mount | quote }}              
+              value: {{ .Values.persistence.mount | quote }}
             {{- range $k, $v := .Values.environment }}
             - name: {{ $k }}
               value: {{ $v | quote}}
-            {{- end }}           
+            {{- end }}
           volumeMounts:
             - mountPath: {{ .Values.persistence.mount | quote }}
               name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
