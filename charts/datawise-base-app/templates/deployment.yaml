@@ -60,10 +60,14 @@ spec:
               protocol: TCP
           {{- if .Values.app.health.enabled }}
           livenessProbe:
+            initialDelaySeconds: 50
+            periodSeconds: 20
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
           readinessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 30
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
