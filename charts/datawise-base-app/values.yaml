@@ -31,6 +31,7 @@ db:
     #port: 5432
 
 persistence:
+  enabled: true
   storageClass: "dw-datastore-dev-1"
   accessMode: ReadWriteOnce
   size: "50Gi"
@@ -39,6 +40,7 @@ persistence:
 
 # #for nfs direct
 # persistence:
+#   enabled: true
 #   storageClass: "nfs"
 #   accessMode: ReadWriteMany
 #   size: "50Gi"
@@ -56,6 +58,7 @@ replicaCount: 1
 image:
   registry_base: docker.datawise.ai
   #repository: nginx
+  #workingDir: "/data"
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   #tag: ""

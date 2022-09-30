@@ -1,3 +1,4 @@
+{{- if .Values.persistence.enabled -}}
 {{- if eq .Values.persistence.storageClassName "nfs" }}
 apiVersion: v1
 kind: PersistentVolume
@@ -14,4 +15,5 @@ spec:
   nfs:
     path: /{{ .Values.persistence.nfs.export }}
     server: {{ .Values.persistence.nfs.server }}
+{{- end }}
 {{- end }}
