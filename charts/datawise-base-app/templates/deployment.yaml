@@ -40,10 +40,10 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "datawise-base-app.image_registry" . }}/{{ include "datawise-base-app.image_repository" . }}:{{ .Values.image.tag | default .Values.deploy.version }}"
-          {{ if .Values.workingDir }}
+          {{- if .Values.workingDir }}
           workingDir: {{ .Values.image.workingDir | quote }}
           {{- else }}
-          {{ if .Values.persistence.enabled -}}
+          {{- if .Values.persistence.enabled }}
           workingDir: {{ .Values.persistence.mount | quote }}
           {{- end }}
           {{- end }}
@@ -144,12 +144,12 @@ spec:
             - name: {{ $k }}
               value: {{ $v | quote}}
             {{- end }}
-          {{ if .Values.persistence.enabled -}}
+          {{- if .Values.persistence.enabled }}
           volumeMounts:
             - mountPath: {{ .Values.persistence.mount | quote }}
               name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
           {{ end }}
-      {{ if .Values.persistence.enabled -}}
+      {{- if .Values.persistence.enabled }}
       volumes:
         - name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
           persistentVolumeClaim:
