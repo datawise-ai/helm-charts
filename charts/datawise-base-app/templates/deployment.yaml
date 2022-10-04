@@ -148,7 +148,7 @@ spec:
           volumeMounts:
             - mountPath: {{ .Values.persistence.mount | quote }}
               name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
-          {{ end }}
+          {{- end }}
       {{- if .Values.persistence.enabled }}
       volumes:
         - name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
