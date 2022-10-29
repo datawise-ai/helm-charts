@@ -16,7 +16,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
-  namespace: {{ include "datawise-base-app.namespace" . }}    
+  namespace: {{ include "datawise-base-app.namespace" . }}
   labels:
     {{- include "datawise-base-app.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -34,7 +34,7 @@ spec:
         {{- range .hosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ .secretName }}
+      secretName: {{ include "datawise-base-app.fullname" .  }}
     {{- end }}
   {{- else }}
   tls:
@@ -43,7 +43,7 @@ spec:
       secretName: {{ include "datawise-base-app.fullname" .  }}
   {{- end }}
   rules:
-  {{- if .Values.ingress.hosts }}    
+  {{- if .Values.ingress.hosts }}
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
@@ -70,7 +70,7 @@ spec:
       http:
         paths:
           - path: {{ .Values.deploy.path }}
-            pathType: Prefix    
+            pathType: Prefix
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
