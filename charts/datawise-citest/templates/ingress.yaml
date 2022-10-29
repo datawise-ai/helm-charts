@@ -34,7 +34,7 @@ spec:
         {{- range .hosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ include "datawise-base-app.fullname" .  }}
+      secretName: {{ .secretName }}
     {{- end }}
   {{- else }}
   tls:
