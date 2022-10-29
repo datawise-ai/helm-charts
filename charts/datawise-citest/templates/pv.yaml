@@ -8,10 +8,10 @@ spec:
   capacity:
     storage: "{{ .Values.persistence.size }}"
   volumeMode: Filesystem
-  accessModes: [ {{ .Values.persistence.accessMode }} ]
+  accessModes:  [ {{ .Values.persistence.accessMode }} ] 
   persistentVolumeReclaimPolicy: Retain
   storageClassName: {{ .Values.persistence.storageClass }}
-  mountOptions: [ {{ .Values.persistence.nfs.options }} ]
+  mountOptions:  {{- range .Values.persistence.nfs.options }}
   nfs:
     path: {{ .Values.persistence.nfs.export }}
     server: {{ .Values.persistence.nfs.server }}
