@@ -1,5 +1,5 @@
 {{- if .Values.persistence.enabled -}}
-{{- if eq .Values.persistence.storageClassName "nfs" }}
+{{- if eq .Values.persistence.storageClass "nfs" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -13,7 +13,7 @@ spec:
   storageClassName: {{ .Values.persistence.storageClass }}
   mountOptions: {{ .Values.persistence.nfs.options }}
   nfs:
-    path: /{{ .Values.persistence.nfs.export }}
+    path: {{ .Values.persistence.nfs.export }}
     server: {{ .Values.persistence.nfs.server }}
 {{- end }}
 {{- end }}
