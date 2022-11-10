@@ -148,17 +148,17 @@ spec:
           volumeMounts:
             {{- if .Values.multipleMounts.enabled }}
               {{- range .Values.multipleMounts.mountPoints }}
-            - name: "volName"
+            - name: "volname"
               mountPath: {{ .path }}
               subPath: {{ .point }}
               {{- end }}
             {{- else }}
             - mountPath: {{ .Values.persistence.mount | quote }}
-              name: "volName"
+              name: "volname"
             {{- end }}
           {{- end }}
       volumes:
-        - name: "volName"
+        - name: "volname"
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: "{{ .Values.persistence.existingClaim | default (include "datawise-base-app.fullname" .) }}-{{ .Values.persistence.name }}"
