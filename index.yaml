@@ -213,6 +213,16 @@ entries:
   datawise-citest:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2022-11-10T17:23:19.038982424Z"
+    description: A Helm chart for citest
+    digest: be11811c13fcfd0e48dcb344746156e8e11ea5cb4ceccaa5ad9064fdb0aab3e3
+    name: datawise-citest
+    type: application
+    urls:
+    - https://github.com/datawise-ai/helm-charts/releases/download/datawise-citest-0.0.8/datawise-citest-0.0.8.tgz
+    version: 0.0.8
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2022-11-10T17:08:57.49175092Z"
     description: A Helm chart for citest
     digest: 30a0330afe733a3d40c790f8ca618a57f655746dd210a2875590bf2883526316
@@ -281,4 +291,4 @@ entries:
     urls:
     - https://github.com/datawise-ai/helm-charts/releases/download/datawise-citest-0.0.1/datawise-citest-0.0.1.tgz
     version: 0.0.1
-generated: "2022-11-10T17:08:57.492292022Z"
+generated: "2022-11-10T17:23:19.039099725Z"
