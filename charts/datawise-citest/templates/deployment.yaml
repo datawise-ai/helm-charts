@@ -40,7 +40,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "datawise-base-app.image_registry" . }}/{{ include "datawise-base-app.image_repository" . }}:{{ .Values.image.tag | default .Values.deploy.version }}"
-          {{- if .Values.workingDir }}
+          {{- if .Values.image.workingDir }}
           workingDir: {{ .Values.image.workingDir | quote }}
           {{- else }}
           {{- if .Values.persistence.enabled }}
@@ -146,15 +146,25 @@ spec:
             {{- end }}
           {{- if .Values.persistence.enabled }}
           volumeMounts:
+            {{- if .Values.multipleMounts.enabled }}
+              {{- range .Values.multipleMounts.mountPoints }}
+            - mountPath: {{ .path }}
+              name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+              subPath: {{ .point }}
+              {{- end }}
+            {{- else }}
             - mountPath: {{ .Values.persistence.mount | quote }}
               name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+            {{- end }}
           {{- end }}
-      {{- if .Values.persistence.enabled }}
       volumes:
         - name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: "{{ .Values.persistence.existingClaim | default (include "datawise-base-app.fullname" .) }}-{{ .Values.persistence.name }}"
-      {{- end }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

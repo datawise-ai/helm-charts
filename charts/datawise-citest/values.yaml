@@ -52,6 +52,14 @@ persistence:
 #         - hard
 #         - nfsvers=3
 
+multipleMounts:
+  enabled: false
+  # mountPoints:
+  #   - point: "dataA"
+  #     path: "/dataA"
+  #   - point: "dataB"
+  #     path: "/dataB"
+
 
 replicaCount: 1
 
