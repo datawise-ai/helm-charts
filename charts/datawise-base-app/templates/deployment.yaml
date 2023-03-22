@@ -138,8 +138,6 @@ spec:
               value: "http://{{ include "datawise-base-app.hostname" . }}"
             - name: API_PORT
               value: {{ .Values.app.port | quote }}
-            - name: PORT
-              value: {{ .Values.app.port | quote }}
             - name: STORAGE_HOME
               value: {{ .Values.persistence.mount | quote }}
             {{- range $k, $v := .Values.environment }}
@@ -148,15 +146,25 @@ spec:
             {{- end }}
           {{- if .Values.persistence.enabled }}
           volumeMounts:
+            {{- if .Values.multipleMounts.enabled }}
+              {{- range .Values.multipleMounts.mountPoints }}
+            - name: "volname"
+              mountPath: {{ .path }}
+              subPath: {{ .point }}
+              {{- end }}
+            {{- else }}
             - mountPath: {{ .Values.persistence.mount | quote }}
-              name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+              name: "volname"
+            {{- end }}
           {{- end }}
-      {{- if .Values.persistence.enabled }}
       volumes:
-        - name: "{{ include "datawise-base-app.fullname" . }}-{{ .Values.persistence.name }}"
+        - name: "volname"
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: "{{ .Values.persistence.existingClaim | default (include "datawise-base-app.fullname" .) }}-{{ .Values.persistence.name }}"
-      {{- end }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
