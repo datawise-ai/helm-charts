@@ -138,6 +138,8 @@ spec:
               value: "http://{{ include "datawise-base-app.hostname" . }}"
             - name: API_PORT
               value: {{ .Values.app.port | quote }}
+            - name: PORT
+              value: {{ .Values.app.port | quote }}
             - name: STORAGE_HOME
               value: {{ .Values.persistence.mount | quote }}
             {{- range $k, $v := .Values.environment }}
