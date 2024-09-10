@@ -71,12 +71,33 @@ spec:
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
           readinessProbe:
             initialDelaySeconds: 20
             periodSeconds: 30
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.app.health.path }}
+              port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
+            failureThreshold: 30
+            periodSeconds: 10
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

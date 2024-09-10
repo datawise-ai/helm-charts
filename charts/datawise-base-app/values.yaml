@@ -9,8 +9,13 @@ deploy:
 app:
   port: 80
   health:
-    enabled: true
+    enabled: false
     path: /
+    httpHeaders:
+      enabled: false
+      authorization:
+        user: dw
+        pass: dw1122
 
 environment:
   _JAVA_OPTIONS: -Xmx4g
