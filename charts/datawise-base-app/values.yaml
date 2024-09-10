@@ -10,7 +10,7 @@ app:
   port: 80
   health:
     enabled: false
-    path: /
+    path: /actuator/health
     httpHeaders:
       enabled: false
       authorization:
