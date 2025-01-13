@@ -1,0 +1,208 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ include "datawise-base-app.namespace" . }}
+  name: {{ include "datawise-base-app.fullname" . }}
+  labels:
+    {{- include "datawise-base-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "datawise-base-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      namespace: {{ include "datawise-base-app.namespace" . }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "datawise-base-app.selectorLabels" . | nindent 8 }}
+        {{- include "datawise-base-app.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.image.pullSecrets }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      imagePullSecrets:
+        - name: {{ .Values.deploy.project }}-registry-secret
+      {{- end }}
+      serviceAccountName: {{ include "datawise-base-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "datawise-base-app.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ include "datawise-base-app.image_registry" . }}/{{ include "datawise-base-app.image_repository" . }}:{{ .Values.image.tag | default .Values.deploy.version }}"
+          {{- if .Values.image.workingDir }}
+          workingDir: {{ .Values.image.workingDir | quote }}
+          {{- else }}
+          {{- if .Values.persistence.enabled }}
+          workingDir: {{ .Values.persistence.mount | quote }}
+          {{- end }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.image.command }}
+          {{- with .Values.image.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          {{- if .Values.image.args }}
+          {{- with .Values.image.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          ports:
+            - name: appport
+              containerPort: {{ .Values.app.port }}
+              protocol: TCP
+          {{- if .Values.app.health.enabled }}
+          livenessProbe:
+            initialDelaySeconds: 50
+            periodSeconds: 20
+            httpGet:
+              path: {{ .Values.app.health.path }}
+              port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
+          readinessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            httpGet:
+              path: {{ .Values.app.health.path }}
+              port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.app.health.path }}
+              port: {{ .Values.app.health.port | default .Values.app.port }}
+              {{- if .Values.app.health.httpHeaders.enabled }}
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
+              {{- end }}
+            failureThreshold: 30
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: "{{ .Values.deploy.project }}-config"
+                optional: true
+            - configMapRef:
+                name: "{{ .Values.deploy.project }}-{{ .Values.deploy.app }}-config"
+                optional: true
+            - configMapRef:
+                name: "{{ .Values.deploy.project }}-{{ .Values.deploy.app }}-{{ .Values.deploy.service }}-config"
+                optional: true
+            - configMapRef:
+                name: "{{ .Values.deploy.project }}-{{ .Values.deploy.instance }}-config"
+                optional: true
+            - configMapRef:
+                name: "{{ include "datawise-base-app.fullname" .  }}-config"
+                optional: true
+            - secretRef:
+                name: "{{ include "datawise-base-app.fullname" .  }}-secrets"
+                optional: {{ .Values.deploy.require_secrets }}
+            {{- range .Values.configMaps }}
+            - configMapRef:
+                name: {{ .name }}
+                {{- if .optional }}
+                optional: {{ .optional }}
+                {{- end }}
+            {{- end }}
+            {{- range .Values.secrets }}
+            - secretRef:
+                name: {{ .name }}
+                {{- if .optional }}
+                optional: {{ .optional }}
+                {{- end }}
+            {{- end }}
+          env:
+            {{- if .Values.db.connection.host }}
+            - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
+              value: {{ .Values.db.connection.host | quote }}
+            {{- end }}
+            {{- if .Values.db.connection.port }}
+            - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.port }}
+              value: {{ .Values.db.connection.port | quote }}
+            {{- end }}
+            - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.user }}
+              value: {{ include "datawise-base-app.db_connection.user" . | quote }}
+            - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.catalog }}
+              value: {{ include "datawise-base-app.db_connection.catalog" . | quote }}
+            - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.name }}
+              value: {{ include "datawise-base-app.db_connection.catalog" . | quote }}
+            - name: HOSTNAME
+              value: {{ include "datawise-base-app.hostname" .  | quote }}
+            - name: APP_URL
+              value: {{ include "datawise-base-app.hostname" .  | quote }}
+            - name: APP_URL_HTTPS
+              value: "https://{{ include "datawise-base-app.hostname" . }}"
+            - name: APP_URL_HTTP
+              value: "http://{{ include "datawise-base-app.hostname" . }}"
+            - name: API_PORT
+              value: {{ .Values.app.port | quote }}
+            - name: PORT
+              value: {{ .Values.app.port | quote }}
+            - name: STORAGE_HOME
+              value: {{ .Values.persistence.mount | quote }}
+            {{- range $k, $v := .Values.environment }}
+            - name: {{ $k }}
+              value: {{ $v | quote}}
+            {{- end }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: volmodels
+              mountPath: /models
+            {{- if .Values.multipleMounts.enabled }}
+              {{- range .Values.multipleMounts.mountPoints }}
+            - name: "volname"
+              mountPath: {{ .path }}
+              subPath: {{ .point }}
+              {{- end }}
+            {{- else }}
+            - mountPath: {{ .Values.persistence.mount | quote }}
+              name: "volname"
+            {{- end }}
+          {{- end }}
+      volumes:
+        - name: volmodels
+          hostPath:
+            path: /models
+            type: Directory
+        - name: "volname"
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: "{{ .Values.persistence.existingClaim | default (include "datawise-base-app.fullname" .) }}-{{ .Values.persistence.name }}"
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
