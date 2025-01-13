@@ -381,4 +381,15 @@ entries:
     urls:
     - https://github.com/datawise-ai/helm-charts/releases/download/datawise-citest-0.0.1/datawise-citest-0.0.1.tgz
     version: 0.0.1
-generated: "2024-11-15T13:27:12.772073561Z"
+  datawise-models-app:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-01-13T13:54:33.782223899Z"
+    description: A Helm chart for Kubernetes
+    digest: 9d8f5772f2e6243fb369d81624cbd5cc266680c9bf2ee64a053a623db996062b
+    name: datawise-models-app
+    type: application
+    urls:
+    - https://github.com/datawise-ai/helm-charts/releases/download/datawise-models-app-0.1.1/datawise-models-app-0.1.1.tgz
+    version: 0.1.1
+generated: "2025-01-13T13:54:33.782469918Z"
