@@ -1,0 +1,15 @@
+{{- if .Values.persistence.enabled -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: {{ include "imgproxy-app.namespace" . }}
+  name: {{ include "imgproxy-app.fullname" . }}-{{ .Values.persistence.name }}
+  labels:
+    {{- include "imgproxy-app.labels" . | nindent 4 }}
+spec:
+  accessModes: [ {{ .Values.persistence.accessMode }} ]
+  resources:
+    requests:
+      storage: "{{ .Values.persistence.size }}"
+  storageClassName: {{ .Values.persistence.storageClass }}
+{{- end }}

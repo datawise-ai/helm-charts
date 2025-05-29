@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ include "imgproxy-app.namespace" . }}    
+  name: {{ include "imgproxy-app.fullname" . }}-nginx-server
+data:
+  default.conf.template: |
+    server {
+      #limit_req zone=one burst=30;
+
+      server_name _;
+
+      access_log /var/log/nginx/access.log;
+      error_log /var/log/nginx/error.log;
+
+      include /etc/nginx/conf.d/*.server;
+
+      location / {
+        proxy_pass http://127.0.0.1:{{ .Values.imgproxy.port }};
+        proxy_http_version 1.1;
+        proxy_pass_request_headers on;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade; # allow websockets
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        #proxy_set_header Connection $connection_upgrade;
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ include "imgproxy-app.namespace" . }}    
+  name: {{ include "imgproxy-app.fullname" . }}-nginx-rules
+data:
+  rules.server.template: |+
+    if ($args ~ original){
+      rewrite ^/(.+)$ /insecure/wm:0.7:soea:0:0:0.20/plain/s3://${S3_BUCKET_NAME}$1 break;
+    }
+
+    if ($args ~ w=.*){
+      rewrite ^/(.+)$ /insecure/rs:fit:$arg_w:0:false:0/plain/s3://${S3_BUCKET_NAME}$1 break;
+    }
+
+    rewrite ^/(.+)$ /insecure/rs:fit:3000:3000:false:0/wm:0.7:soea:0:0:0.20/plain/s3://${S3_BUCKET_NAME}$1 break;

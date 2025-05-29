@@ -1,0 +1,22 @@
+{{- if .Values.persistence.enabled -}}
+{{- if eq .Values.persistence.storageClass "nfs" }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "imgproxy-app.fullname" . }}-{{ .Values.persistence.name }}
+spec:
+  capacity:
+    storage: "{{ .Values.persistence.size }}"
+  volumeMode: Filesystem
+  accessModes: [ {{ .Values.persistence.accessMode }} ]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.persistence.storageClass }}
+  mountOptions:
+          {{- range .Values.persistence.nfs.options }}
+          - {{ . | quote }}
+          {{- end }}
+  nfs:
+    path: {{ .Values.persistence.nfs.export }}
+    server: {{ .Values.persistence.nfs.server }}
+{{- end }}
+{{- end }}

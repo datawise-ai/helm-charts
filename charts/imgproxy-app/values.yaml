@@ -1,0 +1,128 @@
+# Default values for imgproxy-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+environment:
+  nginx:
+    S3_BUCKET_NAME: ""
+  imgproxy:
+    IMGPROXY_USE_S3: true
+    #AWS_ACCESS_KEY_ID:
+    #AWS_SECRET_ACCESS_KEY:
+    IMGPROXY_S3_REGION: "us-east-1"
+    IMGPROXY_S3_ENDPOINT: "s3.us-east-1.amazonaws.com"
+    IMGPROXY_REQUESTS_QUEUE_SIZE: 256
+    IMGPROXY_MAX_CLIENTS: 25
+    IMGPROXY_ALLOWED_SOURCES: "s3://*TO_BE_DEFINED*"
+
+
+
+nginx:
+  tag: "latest"
+  port: 80
+
+imgproxy:
+  tag: "latest"
+  port: 8080
+  
+
+deploy:
+  path: "/"
+#  project: "test1"
+#  app: "app1"
+#  service: service1
+#  instance: instance1
+
+
+app:
+  port: 80
+  health:
+    enabled: false
+    path: /
+
+image:
+  pullSecrets:
+
+persistence:
+  enabled: false
+
+
+replicaCount: 1
+
+#imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    nginx.org/client-max-body-size: "16m"
+    #nginx.org/mergeable-ingress-type: "master"
+  # hosts:
+  #   - host: test12.dev.datawise.ai
+  #     paths:
+  #       - path: /
+  #         pathType: Prefix
+  # tls:
+  #   - secretName: testa12-another
+  #     hosts:
+  #       - test12.dev.datawise.ai
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 4000m
+    memory: 4096Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: 
+  topology/nodegroup: "default"
+tolerations: []
+
+affinity: {}
+
+multipleMounts:
+  enabled: false

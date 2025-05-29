@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ include "imgproxy-app.namespace" . }}
+  name: {{ include "imgproxy-app.fullname" . }}
+  labels:
+    {{- include "imgproxy-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "imgproxy-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      namespace: {{ include "imgproxy-app.namespace" . }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "imgproxy-app.selectorLabels" . | nindent 8 }}
+        {{- include "imgproxy-app.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.image.pullSecrets }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      imagePullSecrets:
+        - name: {{ .Values.deploy.project }}-registry-secret
+      {{- end }}
+      serviceAccountName: {{ include "imgproxy-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+
+      containers:
+        - name: nginx
+          image: "{{ .Values.nginx.image | default "nginx"}}:{{ .Values.nginx.tag | default "latest"}}"
+          {{- if .Values.nginx.workingDir }}
+          workingDir: {{ .Values.nginx.workingDir | quote }}
+          {{- else }}
+          {{- if .Values.persistence.enabled }}
+          workingDir: {{ .Values.persistence.mount | quote }}
+          {{- end }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.nginx.pullPolicy | default "Always" }}
+          {{- if .Values.nginx.command }}
+          {{- with .Values.nginx.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          {{- if .Values.nginx.args }}
+          {{- with .Values.nginx.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          ports:
+            - name: appport
+              containerPort: {{ .Values.nginx.port }}
+              protocol: TCP
+          volumeMounts:
+          - name: nginx-server
+            mountPath: /etc/nginx/templates/default.conf.template
+            subPath: default.conf.template 
+          - name: nginx-rules
+            mountPath: /etc/nginx/templates/rules.server.template
+            subPath: rules.server.template   
+          env:
+            {{- range $k, $v := .Values.environment.nginx }}
+            - name: {{ $k }}
+              value: {{ $v | quote}}
+            {{- end }}    
+
+        - name: imgproxy
+          image: "{{ .Values.imgproxy.image | default "darthsim/imgproxy"}}:{{ .Values.imgproxy.imagetag | default "latest"}}"
+          {{- if .Values.imgproxy.workingDir }}
+          workingDir: {{ .Values.imgproxy.workingDir | quote }}
+          {{- else }}
+          {{- if .Values.persistence.enabled }}
+          workingDir: {{ .Values.persistence.mount | quote }}
+          {{- end }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.imgproxy.pullPolicy }}
+          {{- if .Values.imgproxy.command }}
+          {{- with .Values.imgproxy.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          {{- if .Values.imgproxy.args }}
+          {{- with .Values.imgproxy.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end}}
+          {{- end}}
+          ports:
+            - name: appport
+              containerPort: {{ .Values.imgproxy.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: "{{ include "imgproxy-app.fullname" . }}-imgproxy-config"
+                optional: true
+          env:
+            {{- range $k, $v := .Values.environment.imgproxy }}
+            - name: {{ $k }}
+              value: {{ $v | quote}}
+            {{- end }}                          
+      volumes:
+        - name: nginx-server
+          configMap:
+            name: {{ include "imgproxy-app.fullname" . }}-nginx-server
+        - name: nginx-rules
+          configMap:
+            name: {{ include "imgproxy-app.fullname" . }}-nginx-rules
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
