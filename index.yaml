@@ -395,6 +395,16 @@ entries:
   imgproxy-app:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2025-06-02T12:32:53.239336183Z"
+    description: A Helm chart for Kubernetes
+    digest: 462f87a7d42ce3703660779d95425490eae16a9b93e8f3fd8098d4c2e8d4bf82
+    name: imgproxy-app
+    type: application
+    urls:
+    - https://github.com/datawise-ai/helm-charts/releases/download/imgproxy-app-0.2.0/imgproxy-app-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-05-29T16:50:05.87824955Z"
     description: A Helm chart for Kubernetes
     digest: c9e90812aa450401093a392b6fc33de55c6d6caf7f63ba5fbb9c822f9d6fdf14
@@ -403,4 +413,4 @@ entries:
     urls:
     - https://github.com/datawise-ai/helm-charts/releases/download/imgproxy-app-0.1.0/imgproxy-app-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-29T16:50:05.878479428Z"
+generated: "2025-06-02T12:32:53.239533244Z"
