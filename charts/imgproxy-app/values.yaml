@@ -11,7 +11,7 @@ environment:
     #AWS_ACCESS_KEY_ID:
     #AWS_SECRET_ACCESS_KEY:
     IMGPROXY_S3_REGION: "us-east-1"
-    IMGPROXY_S3_ENDPOINT: "s3.us-east-1.amazonaws.com"
+    #IMGPROXY_S3_ENDPOINT: "s3.us-east-1.amazonaws.com"
     IMGPROXY_REQUESTS_QUEUE_SIZE: 256
     IMGPROXY_MAX_CLIENTS: 25
     IMGPROXY_ALLOWED_SOURCES: "s3://*TO_BE_DEFINED*"
