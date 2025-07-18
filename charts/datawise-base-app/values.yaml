@@ -5,6 +5,7 @@
 deploy:
   path: "/"
   require_secrets: true
+  service: app
 
 app:
   port: 80

@@ -94,6 +94,7 @@ app.kubernetes.io/app-project: {{ .Values.deploy.project  }}
 app.kubernetes.io/app-name: {{ .Values.deploy.app  }}
 app.kubernetes.io/app-instance: {{ .Values.deploy.instance  }}
 app.kubernetes.io/app-version: {{ .Values.deploy.version | quote }}
+app.kubernetes.io/app-service: {{ .Values.deploy.service | quote }}
 {{- end }}
 
 {{/*
