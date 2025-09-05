@@ -135,6 +135,10 @@ spec:
                 {{- end }}
             {{- end }}
           env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
               value: {{ .Values.db.connection.host | quote }}
