@@ -47,7 +47,7 @@ spec:
             - >
               set -e;
               curl -sSfL -o /otel/otel-javaagent.jar
-              https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/{{ default "2.7.0" .Values.otel.agentVersion }}/opentelemetry-javaagent.jar;
+              https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/{{ default "v2.20.0" .Values.otel.agentVersion }}/opentelemetry-javaagent.jar;
               ls -l /otel
           volumeMounts:
             - name: otel-agent

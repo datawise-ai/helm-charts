@@ -152,8 +152,8 @@ inject-otel: false
 # (also supported: otel.inject: true)
 
 otel:
-  agentVersion: "2.7.0"  
-  collectorEndpoint: "http://otel-collector.logging.svc.cluster.local:4317"
+  agentVersion: "v2.20.0"  
+  collectorEndpoint: "http://otel-collector-opentelemetry-collector.logging.svc.cluster.local:4317"
   traces: false           # set true if you want traces as well as metrics
   resourceAttributes: ""
   serviceName: ""
