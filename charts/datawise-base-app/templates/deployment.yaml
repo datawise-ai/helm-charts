@@ -1,3 +1,4 @@
+{{- $injectOtel := or .Values.otel.inject (index .Values "inject-otel") -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,6 +36,24 @@ spec:
       serviceAccountName: {{ include "datawise-base-app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      {{- if $injectOtel }}
+      initContainers:
+        - name: fetch-otel-agent
+          image: curlimages/curl:8.9.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh","-c"]
+          args:
+            - >
+              set -e;
+              curl -sSfL -o /otel/otel-javaagent.jar
+              https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/{{ default "2.7.0" .Values.otel.agentVersion }}/opentelemetry-javaagent.jar;
+              ls -l /otel
+          volumeMounts:
+            - name: otel-agent
+              mountPath: /otel
+      {{- end }}
+
       containers:
         - name: {{ include "datawise-base-app.fullname" . }}
           securityContext:
@@ -139,6 +158,22 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if $injectOtel }}
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/otel/otel-javaagent.jar"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_METRICS_EXPORTER
+              value: "otlp"
+            - name: OTEL_SERVICE_NAME
+              value: {{ include "datawise-base-app.otelServiceName" . | trim | quote }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ default "http://otel-collector.logging.svc.cluster.local:4317" .Values.otel.collectorEndpoint | quote }}
+            - name: OTEL_TRACES_EXPORTER
+              value: {{ ternary "otlp" "none" (or .Values.otel.traces false) | quote }}
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: {{ include "datawise-base-app.otelResourceAttributes" . | trim | quote }}
+            {{- end }}
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
               value: {{ .Values.db.connection.host | quote }}
@@ -171,17 +206,23 @@ spec:
             - name: {{ $k }}
               value: {{ $v | quote}}
             {{- end }}
-          {{- if .Values.persistence.enabled }}
+          {{- if or .Values.persistence.enabled $injectOtel }}
           volumeMounts:
-            {{- if .Values.multipleMounts.enabled }}
-              {{- range .Values.multipleMounts.mountPoints }}
+            {{- if .Values.persistence.enabled }}
+              {{- if .Values.multipleMounts.enabled }}
+                {{- range .Values.multipleMounts.mountPoints }}
             - name: "volname"
               mountPath: {{ .path }}
               subPath: {{ .point }}
+                {{- end }}
+              {{- else }}
+            - name: "volname"
+              mountPath: {{ .Values.persistence.mount | quote }}
               {{- end }}
-            {{- else }}
-            - mountPath: {{ .Values.persistence.mount | quote }}
-              name: "volname"
+            {{- end }}
+            {{- if $injectOtel }}
+            - name: otel-agent
+              mountPath: /otel
             {{- end }}
           {{- end }}
       volumes:
@@ -192,6 +233,10 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if $injectOtel }}
+        - name: otel-agent
+          emptyDir: {}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

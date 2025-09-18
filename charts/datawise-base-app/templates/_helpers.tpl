@@ -115,3 +115,29 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/* toggle: otel injection enabled? */}}
+{{- define "datawise-base-app.injectOtel" -}}
+{{- if or .Values.otel.inject (index .Values "inject-otel") -}}true{{- end -}}
+{{- end -}}
+
+{{/* OTEL service name */}}
+{{- define "datawise-base-app.otelServiceName" -}}
+{{- if .Values.otel.serviceName -}}
+{{ .Values.otel.serviceName }}
+{{- else -}}
+{{- printf "%s-%s" .Values.deploy.app .Values.deploy.service -}}
+{{- end -}}
+{{- end -}}
+
+{{/* OTEL resource attributes */}}
+{{- define "datawise-base-app.otelResourceAttributes" -}}
+{{- $ns := .Values.deploy.project -}}
+{{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
+{{- $env := (default "dev" .Values.environment.ACTIVE_PROFILE) -}}
+{{- if .Values.otel.resourceAttributes -}}
+{{ .Values.otel.resourceAttributes }}
+{{- else -}}
+{{- printf "service.namespace=%s,service.version=%s,deployment.environment=%s" $ns $ver $env -}}
+{{- end -}}
+{{- end -}}

@@ -145,3 +145,15 @@ affinity: {}
 
 multipleMounts:
   enabled: false
+
+
+# turn it on
+inject-otel: false
+# (also supported: otel.inject: true)
+
+otel:
+  agentVersion: "2.7.0"  
+  collectorEndpoint: "http://otel-collector.logging.svc.cluster.local:4317"
+  traces: false           # set true if you want traces as well as metrics
+  resourceAttributes: ""
+  serviceName: ""
