@@ -159,20 +159,38 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             {{- if $injectOtel }}
+            - name: OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED
+              value: "true"
+            - name: OTEL_INSTRUMENTATION_LOG4J_MDC_ENABLED
+              value: "true"            
             - name: JAVA_TOOL_OPTIONS
-              value: "-javaagent:/otel/otel-javaagent.jar"
+              value: "-javaagent:/otel/otel-javaagent.jar -Dotel.instrumentation.executor.enabled=true"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
             - name: OTEL_METRICS_EXPORTER
               value: "otlp"
+            - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
+              value: "grpc"
             - name: OTEL_SERVICE_NAME
               value: {{ include "datawise-base-app.otelServiceName" . | trim | quote }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: {{ default "http://otel-collector.logging.svc.cluster.local:4317" .Values.otel.collectorEndpoint | quote }}
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
             - name: OTEL_TRACES_EXPORTER
               value: {{ ternary "otlp" "none" (or .Values.otel.traces false) | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: {{ include "datawise-base-app.otelResourceAttributes" . | trim | quote }}
+            - name: OTEL_PROPAGATORS
+              value: "tracecontext,baggage"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_JAVAAGENT_LOGGING
+              value: "application"
+            - name: LOGGING_PATTERN_CONSOLE
+              value: "%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{64}->%M() - trace_id=%X{trace_id:-} span_id=%X{span_id:-} %msg%n"
+            - name: OTEL_INSTRUMENTATION_SPRING_SCHEDULING_ENABLED
+              value: "true"
             {{- end }}
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
