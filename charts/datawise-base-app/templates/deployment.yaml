@@ -165,8 +165,6 @@ spec:
               value: "true"            
             - name: JAVA_TOOL_OPTIONS
               value: "-javaagent:/otel/otel-javaagent.jar -Dotel.instrumentation.executor.enabled=true"
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
-              value: "grpc"
             - name: OTEL_METRICS_EXPORTER
               value: "otlp"
             - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
@@ -174,7 +172,9 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: {{ include "datawise-base-app.otelServiceName" . | trim | quote }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ default "http://otel-collector.logging.svc.cluster.local:4317" .Values.otel.collectorEndpoint | quote }}
+              value: {{ default "http://otel-collector-opentelemetry-collector.logging.svc.cluster.local:4317" .Values.otel.collectorEndpoint | quote }}
+            - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+              value: {{ default "http://prometheus-server.prometheus.svc.cluster.local:9090/api/v1/otlp" .Values.otel.metricsEndpoint | quote }}
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
             - name: OTEL_TRACES_EXPORTER
