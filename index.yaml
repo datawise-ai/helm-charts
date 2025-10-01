@@ -3,6 +3,16 @@ entries:
   datawise-base-app:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2025-10-01T16:28:12.782875404Z"
+    description: A Helm chart for Kubernetes
+    digest: 35fd2d877cb6649994cc758edfbea093a32b75b0095abc6eae138ba76759ccf8
+    name: datawise-base-app
+    type: application
+    urls:
+    - https://github.com/datawise-ai/helm-charts/releases/download/datawise-base-app-0.1.48/datawise-base-app-0.1.48.tgz
+    version: 0.1.48
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-09-26T10:35:23.315973977Z"
     description: A Helm chart for Kubernetes
     digest: f12afba560d1d34ca332446847ff0d2cd2ae52145c3f8a7d57ecd954ee001f45
@@ -573,4 +583,4 @@ entries:
     urls:
     - https://github.com/datawise-ai/helm-charts/releases/download/imgproxy-app-0.1.0/imgproxy-app-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-26T10:35:23.316323355Z"
+generated: "2025-10-01T16:28:12.783318021Z"
