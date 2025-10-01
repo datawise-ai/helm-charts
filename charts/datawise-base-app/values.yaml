@@ -153,7 +153,10 @@ inject-otel: false
 
 otel:
   agentVersion: "v2.20.0"  
-  collectorEndpoint: "http://otel-collector-opentelemetry-collector.logging.svc.cluster.local:4317"
+  # collectorEndpoint: "http://otel-collector-opentelemetry-collector.logging.svc.cluster.local:4317"
+  collectorEndpoint: ""
+  #  metricsEndpoint: "http://prometheus-server.prometheus.svc.cluster.local:80/api/v1/otlp/v1/metrics"
+  metricsEndpoint: ""
   traces: false           # set true if you want traces as well as metrics
   resourceAttributes: ""
   serviceName: ""
