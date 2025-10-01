@@ -177,6 +177,10 @@ spec:
               value: {{ default "http://prometheus-server.prometheus.svc.cluster.local:80/api/v1/otlp/v1/metrics" .Values.otel.metricsEndpoint | quote }}
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: "grpc"
+            - name: OTEL_METRICS_EXPORTER
+              value: "otlp"
+            - name: OTEL_EXPORTER_OTLP_METRICS_PROTOCOL
+              value: "http/protobuf"
             - name: OTEL_TRACES_EXPORTER
               value: {{ ternary "otlp" "none" (or .Values.otel.traces false) | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
@@ -191,6 +195,14 @@ spec:
               value: "%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{64}->%M() - trace_id=%X{trace_id:-} span_id=%X{span_id:-} %msg%n"
             - name: OTEL_INSTRUMENTATION_SPRING_SCHEDULING_ENABLED
               value: "true"
+            - name: OTEL_INSTRUMENTATION_EXECUTORS_ENABLED
+              value: "true"
+            - name: OTEL_RESOURCE_DETECTORS
+              value: "k8s,env,os,host"
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "10000"
+            - name: OTEL_METRICS_EXEMPLAR_FILTER
+              value: "trace_based"
             {{- end }}
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}

@@ -132,12 +132,19 @@ Create the name of the service account to use
 
 {{/* OTEL resource attributes */}}
 {{- define "datawise-base-app.otelResourceAttributes" -}}
-{{- $ns := .Values.deploy.project -}}
-{{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
-{{- $env := (default "dev" .Values.environment.ACTIVE_PROFILE) -}}
-{{- if .Values.otel.resourceAttributes -}}
-{{ .Values.otel.resourceAttributes }}
-{{- else -}}
-{{- printf "service.namespace=%s,service.version=%s,deployment.environment=%s" $ns $ver $env -}}
-{{- end -}}
+  {{- $ns := .Values.deploy.project -}}
+  {{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
+
+  {{/* Build env = project-app-service-instance (lowercased, no leading/trailing or duplicate dashes) */}}
+  {{- $p := default "" .Values.deploy.project -}}
+  {{- $a := default "" .Values.deploy.app -}}
+  {{- $s := default "" .Values.deploy.service -}}
+  {{- $i := default "" .Values.deploy.instance -}}
+  {{- $env := printf "%s-%s-%s-%s" $p $a $s $i | regexReplaceAll "-+" "-" | trimAll "-" | lower -}}
+
+  {{- if .Values.otel.resourceAttributes -}}
+    {{ .Values.otel.resourceAttributes }}
+  {{- else -}}
+    {{- printf "service.namespace=%s,service.version=%s,deployment.environment=%s" $ns $ver $env -}}
+  {{- end -}}
 {{- end -}}
