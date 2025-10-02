@@ -95,6 +95,7 @@ app.kubernetes.io/app-name: {{ .Values.deploy.app  }}
 app.kubernetes.io/app-instance: {{ .Values.deploy.instance  }}
 app.kubernetes.io/app-version: {{ .Values.deploy.version | quote }}
 app.kubernetes.io/app-service: {{ .Values.deploy.service | quote }}
+app.kubernetes.io/app-infra: {{ .Values.infraName | quote }}
 {{- end }}
 
 {{/*
@@ -134,6 +135,7 @@ Create the name of the service account to use
 {{- define "datawise-base-app.otelResourceAttributes" -}}
   {{- $ns := .Values.deploy.project -}}
   {{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
+  {{- $inf := .Values.infraName -}}
 
   {{/* Build env = project-app-service-instance (lowercased, no leading/trailing or duplicate dashes) */}}
   {{- $p := default "" .Values.deploy.project -}}
@@ -145,6 +147,6 @@ Create the name of the service account to use
   {{- if .Values.otel.resourceAttributes -}}
     {{ .Values.otel.resourceAttributes }}
   {{- else -}}
-    {{- printf "service.namespace=%s,service.version=%s,deployment.environment=%s" $ns $ver $env -}}
+    {{- printf "service.namespace=%s,service.version=%s,deployment.environment.name=%s,service.name=%s" $ns $ver $inf $env -}}
   {{- end -}}
 {{- end -}}
