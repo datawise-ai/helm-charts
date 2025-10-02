@@ -96,6 +96,23 @@ app.kubernetes.io/app-instance: {{ .Values.deploy.instance  }}
 app.kubernetes.io/app-version: {{ .Values.deploy.version | quote }}
 app.kubernetes.io/app-service: {{ .Values.deploy.service | quote }}
 app.kubernetes.io/app-infra: {{ .Values.infraName | quote }}
+deployment_environment_name: {{ .Values.infraName | quote }}
+service_namespace: {{ .Values.deploy.project  }}
+{{/* Build service_name = project-app-service-instance (lowercased, de-duped dashes), truncated to 63 with hash if needed */}}
+{{- $p := default "" .Values.deploy.project -}}
+{{- $a := default "" .Values.deploy.app -}}
+{{- $s := default "" .Values.deploy.service -}}
+{{- $i := default "" .Values.deploy.instance -}}
+{{- $raw := printf "%s-%s-%s-%s" $p $a $s $i | regexReplaceAll "-+" "-" | trimAll "-" | lower -}}
+{{- $max := 63 -}}
+{{- $svc := dict "val" $raw -}}
+{{- if gt (len $raw) $max -}}
+  {{- $hash := (sha1sum $raw) | trunc 8 -}}
+  {{- $keep := sub $max (add 1 (len $hash)) -}} {{/* room for - + hash */}}
+  {{- $prefix := substr 0 $keep $raw -}}
+  {{- $_ := set $svc "val" (printf "%s-%s" $prefix $hash) -}}
+{{- end -}}
+service_name: {{ $svc.val | quote }}
 {{- end }}
 
 {{/*
