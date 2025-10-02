@@ -139,27 +139,23 @@ Create the name of the service account to use
 {{- if or .Values.otel.inject (index .Values "inject-otel") -}}true{{- end -}}
 {{- end -}}
 
-{{/* OTEL service name */}}
-{{- define "datawise-base-app.otelServiceName" -}}
-{{- if .Values.otel.serviceName -}}
-{{ .Values.otel.serviceName }}
-{{- else -}}
-{{- printf "%s-%s" .Values.deploy.app .Values.deploy.service -}}
-{{- end -}}
-{{- end -}}
 
-{{/* OTEL resource attributes */}}
-{{- define "datawise-base-app.otelResourceAttributes" -}}
-  {{- $ns := .Values.deploy.project -}}
-  {{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
-  {{- $inf := .Values.infraName -}}
-
-  {{/* Build env = project-app-service-instance (lowercased, no leading/trailing or duplicate dashes) */}}
+{{/* Build env = project-app-service-instance (lowercased, deduped dashes) */}}
+{{- define "datawise-base-app.buildEnv" -}}
   {{- $p := default "" .Values.deploy.project -}}
   {{- $a := default "" .Values.deploy.app -}}
   {{- $s := default "" .Values.deploy.service -}}
   {{- $i := default "" .Values.deploy.instance -}}
-  {{- $env := printf "%s-%s-%s-%s" $p $a $s $i | regexReplaceAll "-+" "-" | trimAll "-" | lower -}}
+  {{- printf "%s-%s-%s-%s" $p $a $s $i | regexReplaceAll "-+" "-" | trimAll "-" | lower -}}
+{{- end -}}
+
+
+{{/* OTEL resource attributes */}}
+{{- define "datawise-base-app.otelResourceAttributes" -}}
+  {{- $ns  := .Values.deploy.project -}}
+  {{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
+  {{- $inf := .Values.infraName -}}
+  {{- $env := include "datawise-base-app.buildEnv" . -}}
 
   {{- if .Values.otel.resourceAttributes -}}
     {{ .Values.otel.resourceAttributes }}
@@ -167,3 +163,13 @@ Create the name of the service account to use
     {{- printf "service.namespace=%s,service.version=%s,deployment.environment.name=%s,service.name=%s" $ns $ver $inf $env -}}
   {{- end -}}
 {{- end -}}
+
+{{/* OTEL service name */}}
+{{- define "datawise-base-app.otelServiceName" -}}
+  {{- if .Values.otel.serviceName -}}
+    {{ .Values.otel.serviceName }}
+  {{- else -}}
+    {{ include "datawise-base-app.buildEnv" . }}
+  {{- end -}}
+{{- end -}}
+
