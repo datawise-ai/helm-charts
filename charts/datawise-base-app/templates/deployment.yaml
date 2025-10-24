@@ -203,6 +203,8 @@ spec:
               value: "10000"
             - name: OTEL_METRICS_EXEMPLAR_FILTER
               value: "trace_based"
+            - name: OTEL_LOG_LEVEL
+              value: "debug"
             {{- end }}
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
