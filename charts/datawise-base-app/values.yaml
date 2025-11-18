@@ -148,6 +148,8 @@ affinity: {}
 multipleMounts:
   enabled: false
 
+environmentDefault:
+  enabled: true
 
 # turn it on
 inject-otel: false

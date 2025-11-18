@@ -206,6 +206,7 @@ spec:
             - name: OTEL_LOG_LEVEL
               value: "debug"
             {{- end }}
+            {{- if .Values.environmentDefault.enabled }}            
             {{- if .Values.db.connection.host }}
             - name: {{ .Values.db.vars.prefix }}{{ .Values.db.vars.host }}
               value: {{ .Values.db.connection.host | quote }}
@@ -228,6 +229,7 @@ spec:
               value: "https://{{ include "datawise-base-app.hostname" . }}"
             - name: APP_URL_HTTP
               value: "http://{{ include "datawise-base-app.hostname" . }}"
+            {{- end }}
             - name: API_PORT
               value: {{ .Values.app.port | quote }}
             - name: PORT
