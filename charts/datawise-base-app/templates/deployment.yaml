@@ -85,8 +85,11 @@ spec:
               protocol: TCP
           {{- if .Values.app.health.enabled }}
           livenessProbe:
-            initialDelaySeconds: 50
+            timeoutSeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 20
+            successThreshold: 1
+            failureThreshold: 3
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
@@ -96,8 +99,11 @@ spec:
                   value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
               {{- end }}
           readinessProbe:
-            initialDelaySeconds: 20
-            periodSeconds: 30
+            timeoutSeconds: 5
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
             httpGet:
               path: {{ .Values.app.health.path }}
               port: {{ .Values.app.health.port | default .Values.app.port }}
@@ -115,8 +121,9 @@ spec:
                 - name: Authorization
                   value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
               {{- end }}
-            failureThreshold: 30
-            periodSeconds: 10
+            failureThreshold: 12
+            periodSeconds: 5
+            timeoutSeconds: 5
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
