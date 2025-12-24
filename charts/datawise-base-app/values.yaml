@@ -100,7 +100,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
-  probe: "true"
+  probe: true
 
 ingress:
   enabled: true

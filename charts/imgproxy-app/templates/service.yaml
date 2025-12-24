@@ -2,7 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations: 
-    prometheus.io/probe: {{ .Values.service.probe}}
+    {{- if .Values.service.probe }}
+    prometheus.io/probe: "true"
+    {{- end }}
   namespace: {{ include "imgproxy-app.namespace" . }}    
   name: {{ include "imgproxy-app.fullname" . }}
   labels:

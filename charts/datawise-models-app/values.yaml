@@ -95,7 +95,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  probe: "true"
+  probe: true
   type: ClusterIP
   port: 80
 
