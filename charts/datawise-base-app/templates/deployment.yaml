@@ -121,7 +121,7 @@ spec:
                 - name: Authorization
                   value: "Basic {{  printf "%s:%s" .Values.app.health.httpHeaders.authorization.user .Values.app.health.httpHeaders.authorization.pass | b64enc }}"
               {{- end }}
-            failureThreshold: 12
+            failureThreshold: 36
             periodSeconds: 5
             timeoutSeconds: 5
           {{- end }}
