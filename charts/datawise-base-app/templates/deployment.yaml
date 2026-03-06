@@ -29,7 +29,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- else }}
+      {{- else if .Values.image.enable_default_pull_secret}}
       imagePullSecrets:
         - name: {{ .Values.deploy.project }}-registry-secret
       {{- end }}

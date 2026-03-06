@@ -64,6 +64,7 @@ persistence:
 replicaCount: 1
 
 image:
+  enable_default_pull_secret : true
   registry_base: docker.datawise.ai
   #repository: nginx
   #workingDir: "/data"
