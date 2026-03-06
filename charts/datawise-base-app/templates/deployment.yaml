@@ -290,7 +290,7 @@ spec:
               driver: secrets-store.csi.k8s.io
               readOnly: true
               volumeAttributes:
-                secretProviderClass: "{{ include "datawise-base-app.fullname" . }}-{{ .name }}"          
+                secretProviderClass: "{{ include "datawise-base-app.fullname" $ }}-{{ .name }}"          
         {{- end }}        
       {{- with .Values.nodeSelector }}
       nodeSelector:
