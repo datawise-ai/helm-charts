@@ -165,3 +165,11 @@ otel:
   traces: false           # set true if you want traces as well as metrics
   resourceAttributes: ""
   serviceName: ""
+
+secretsVolumes: []
+# secretsVolumes:
+#   - name: "env"
+#     enabled: true
+#     mount: "/app/.env"
+#     subPath: ".env"
+#     secret_arn: "arn:aws:secretsmanager:......"

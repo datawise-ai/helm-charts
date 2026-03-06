@@ -247,7 +247,7 @@ spec:
             - name: {{ $k }}
               value: {{ $v | quote}}
             {{- end }}
-          {{- if or .Values.persistence.enabled $injectOtel }}
+          {{- if or .Values.persistence.enabled $injectOtel .Values.secretsVolumes }}
           volumeMounts:
             {{- if .Values.persistence.enabled }}
               {{- if .Values.multipleMounts.enabled }}
@@ -265,6 +265,12 @@ spec:
             - name: otel-agent
               mountPath: /otel
             {{- end }}
+            {{- range .Values.secretsVolumes }}
+              - mountPath: {{ .mount | quote }}
+                name: "{{ .name }}"
+                subPath: {{ .subPath | quote }}
+                readOnly: true
+            {{- end }}                
           {{- end }}
       volumes:
         - name: "volname"
@@ -278,6 +284,14 @@ spec:
         - name: otel-agent
           emptyDir: {}
         {{- end }}
+        {{- range .Values.secretsVolumes }}
+          - name: "{{ .name }}"
+            csi:
+              driver: secrets-store.csi.k8s.io
+              readOnly: true
+              volumeAttributes:
+                secretProviderClass: "{{ include "datawise-base-app.fullname" . }}-{{ .name }}"          
+        {{- end }}        
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
