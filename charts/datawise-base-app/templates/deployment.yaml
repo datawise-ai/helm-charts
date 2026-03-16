@@ -266,11 +266,13 @@ spec:
               mountPath: /otel
             {{- end }}
             {{- range .Values.secretsVolumes }}
+            {{- if .enabled }}
             - mountPath: {{ .mount | quote }}
               name: "{{ .name }}"
               subPath: {{ .subPath | quote }}
               readOnly: true
-            {{- end }}                
+            {{- end }}
+            {{- end }}
           {{- end }}
       volumes:
         - name: "volname"
@@ -285,12 +287,22 @@ spec:
           emptyDir: {}
         {{- end }}
         {{- range .Values.secretsVolumes }}
+        {{- if and .enabled .secret_arn }}
         - name: "{{ .name }}"
           csi:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
               secretProviderClass: "{{ include "datawise-base-app.fullname" $ }}-{{ .name }}"          
+        {{- end }}
+        {{- if and .enabled .secret_name }}
+        - name: "{{ .name }}"
+          secret:
+            secretName: {{ .secret_name }}
+            items:
+              - key: {{ .secret_key }} 
+                path: {{ .subPath }} 
+        {{- end }}
         {{- end }}        
       {{- with .Values.nodeSelector }}
       nodeSelector:
