@@ -171,6 +171,10 @@ spec:
           volumeMounts:
             - name: volmodels
               mountPath: /models
+            - name: volephemeral
+              mountPath: /ephemeral
+            - name: volbottraining
+              mountPath: /bot-training
             {{- if .Values.multipleMounts.enabled }}
               {{- range .Values.multipleMounts.mountPoints }}
             - name: "volname"
@@ -186,6 +190,14 @@ spec:
         - name: volmodels
           hostPath:
             path: /models
+            type: Directory
+        - name: volephemeral
+          hostPath:
+            path: /ephemeral
+            type: Directory
+        - name: volbottraining
+          hostPath:
+            path: /bot-training
             type: Directory
         - name: "volname"
           {{- if .Values.persistence.enabled }}
