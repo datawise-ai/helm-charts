@@ -153,7 +153,7 @@ Create the name of the service account to use
 {{/* OTEL resource attributes */}}
 {{- define "datawise-base-app.otelResourceAttributes" -}}
   {{- $ns  := .Values.deploy.project -}}
-  {{- $ver := (default .Values.deploy.version .Values.image.tag) -}}
+  {{- $ver := (default .Values.deploy.version .Values.image.tag | toString ) -}}
   {{- $inf := .Values.infraName -}}
   {{- $env := include "datawise-base-app.buildEnv" . -}}
 
